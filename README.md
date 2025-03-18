@@ -1,4 +1,4 @@
-# My Flask React App
+# Projeto Tickets Admin
 
 Este projeto é uma aplicação web que utiliza Flask como backend e React como frontend. A aplicação é estruturada para separar as responsabilidades entre o backend e o frontend, permitindo um código limpo e de fácil manutenção.
 
