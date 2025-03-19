@@ -1,0 +1,36 @@
+import { useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+
+function useAuth() {
+    const navigate = useNavigate();
+    const location = useLocation(); // Obtém a rota atual
+
+    useEffect(() => {
+        const checkLogin = async () => {
+            try {
+                const response = await fetch('http://127.0.0.1:5000/check-login', {
+                    method: 'GET',
+                });
+
+                if (response.status === 401 || response.status === 404) {
+                    // Permite navegação apenas entre "/" e "/register"
+                    if (location.pathname !== '/' && location.pathname !== '/register') {
+                        navigate('/'); // Redireciona para o login
+                    }
+                } else if (response.ok) {
+                    const data = await response.json();
+                    document.cookie = `user=${data}; path=/`; // Salva o nome do usuário nos cookies
+                }
+            } catch (error) {
+                console.error('Error checking login:', error);
+                if (location.pathname !== '/' && location.pathname !== '/register') {
+                    navigate('/'); // Redireciona para o login em caso de erro
+                }
+            }
+        };
+
+        checkLogin();
+    }, [navigate, location.pathname]);
+}
+
+export default useAuth;
