@@ -10,3 +10,4 @@ python-dotenv
 bcrypt
 flask-marshmallow
 flask-migrate
+marshmallow-sqlalchemy
