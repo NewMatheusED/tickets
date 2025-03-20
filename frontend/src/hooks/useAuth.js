@@ -8,7 +8,7 @@ function useAuth() {
     useEffect(() => {
         const checkLogin = async () => {
             try {
-                const response = await fetch('http://127.0.0.1:5000/check-login', {
+                const response = await fetch('/api/check-login', {
                     method: 'GET',
                 });
 
@@ -19,7 +19,10 @@ function useAuth() {
                     }
                 } else if (response.ok) {
                     const data = await response.json();
-                    document.cookie = `user=${data}; path=/`; // Salva o nome do usuário nos cookies
+                    document.cookie = `user=${JSON.stringify(data)}; path=/; max-age=${7 * 24 * 60 * 60}`;
+                    if (location.pathname === '/') {
+                        navigate('/home');
+                    }
                 }
             } catch (error) {
                 console.error('Error checking login:', error);
