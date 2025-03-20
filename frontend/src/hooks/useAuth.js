@@ -15,6 +15,7 @@ function useAuth() {
                 if (response.status === 401 || response.status === 404) {
                     // Permite navegação apenas entre "/" e "/register"
                     if (location.pathname !== '/' && location.pathname !== '/register') {
+                        document.cookie = "session=; path=/; max-age=0";
                         navigate('/'); // Redireciona para o login
                     }
                 } else if (response.ok) {

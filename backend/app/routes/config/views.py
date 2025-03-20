@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify, current_app
 import os
 from werkzeug.utils import secure_filename
 from .controller import Controller
+from app.models import User
 
 controller = Controller()
 
@@ -12,16 +13,15 @@ def update_config():
     username = request.form.get('username')
     email = request.form.get('email')
     profile_picture = request.files.get('profile_picture')
-
-    print(username, email, profile_picture)
     
-    filename = 'default.jpg'
     if profile_picture:
         filename = secure_filename(profile_picture.filename)
         upload_folder = current_app.config.get('UPLOAD_FOLDER')
         if not os.path.exists(upload_folder):
             os.makedirs(upload_folder)
         profile_picture.save(os.path.join(upload_folder, filename))
+    else:
+        filename = User.query.filter_by(email=email).first().profile_picture
     
     controller.update_user(username, email, filename)
     

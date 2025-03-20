@@ -11,6 +11,7 @@ def check_login():
     if not user_id_hash:
         user_id_hash = request.cookies.get('user')
         if not user_id_hash:
+            request.cookies.set_cookie('user', '', expires=0)
             return jsonify({'logged_in': False, 'message': 'User not logged in'}), 401
 
     user = User.query.filter_by(user_id_hash=user_id_hash).first()
