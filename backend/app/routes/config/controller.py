@@ -10,3 +10,8 @@ class Controller:
         user.username = username
         user.profile_picture = profile_picture
         db.session.commit()
+
+    def delete_user(self, email):
+        user = User.query.filter_by(email=email).first()
+        db.session.delete(user)
+        db.session.commit()

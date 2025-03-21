@@ -20,6 +20,11 @@ function useAuth() {
                     }
                 } else if (response.ok) {
                     const data = await response.json();
+                    if (!data) {
+                        document.cookie = "session=; path=/; max-age=0";
+                        navigate('/'); // Redireciona para o login
+                        return;
+                    }
                     document.cookie = `user=${JSON.stringify(data)}; path=/; max-age=${7 * 24 * 60 * 60}`;
                     if (location.pathname === '/') {
                         navigate('/home');

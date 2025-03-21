@@ -3,6 +3,7 @@ import { getCookie } from '../../utils/cookies';
 import styles from './Config.module.css';
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
+import { useNavigate } from 'react-router';
 
 
 function Config() {
@@ -12,6 +13,8 @@ function Config() {
   const [previewUrl, setPreviewUrl] = useState('');
   
   const MySwal = withReactContent(Swal)
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -45,6 +48,57 @@ function Config() {
       reader.readAsDataURL(file);
     }
   };
+
+  const handleDelete = (e) => {
+    MySwal.fire({
+      icon: 'info',
+      title: 'Certeza?',
+      text: 'Deseja realmente deletar o usuário?',
+      showCancelButton: true,
+      confirmButtonText: 'Sim',
+      cancelButtonText: 'Não'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const formData = new FormData();
+        formData.append('email', email);
+        try {
+          const response = fetch('/api/deleteUser', {
+            method: 'DELETE',
+            credentials: 'include',
+            body: formData,
+          });
+            response.then((res) => {
+            if (res.ok) {
+              MySwal.fire({
+              title: 'Sucesso!',
+              text: 'Usuário deletado com sucesso!',
+              icon: 'success'
+              });
+              document.cookie = 'user=; path=/';
+              navigate('/');
+            } else {
+              MySwal.fire({
+              title: 'Erro!',
+              text: 'Erro ao deletar o usuário!',
+              icon: 'error'
+              });
+            }
+            }).catch((error) => {
+            console.error('Erro na resposta:', error);
+            MySwal.fire({
+              title: 'Erro!',
+              text: 'Erro ao processar a solicitação!',
+              icon: 'error'
+            });
+            });
+        }
+        catch (error) {
+          console.error(error);
+          alert('Erro ao deletar o usuário');
+        }
+      }
+    })
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -112,6 +166,9 @@ function Config() {
         )}
         <button type="submit" className={styles.submitButton}>
           Salvar Configurações
+        </button>
+        <button type="button" onClick={handleDelete} className={styles.deleteButton}>
+          Deletar Usuário
         </button>
       </form>
     </div>

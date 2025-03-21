@@ -31,3 +31,9 @@ def update_config():
          'profile_picture': filename
     }
     return jsonify(updated_user)
+
+@config_bp.route('/deleteUser', methods=['DELETE'])
+def delete_user():
+    email = request.form.get('email')
+    controller.delete_user(email)
+    return jsonify({'message': 'User deleted'}), 200

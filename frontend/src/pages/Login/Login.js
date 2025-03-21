@@ -56,7 +56,9 @@ function Login() {
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Digite sua senha"
                 />
-                <Button label="Entrar" type="submit" />
+                <Button type="submit">
+                    Entrar
+                </Button>
                 <p>Ainda não tem conta, pegue <a href='/register'>aqui</a></p>
             </form>
         </div>
