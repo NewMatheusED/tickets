@@ -13,6 +13,7 @@ services:
       - tickets_network
 
   backend:
+    build: ./backend  # Diretório onde está o Dockerfile do backend
     image: newmatheused/ticketsadmin_backend:latest
     restart: always
     environment:
@@ -30,14 +31,17 @@ services:
       - tickets_network
 
   frontend:
+    build: ./frontend  # Diretório onde está o Dockerfile do frontend
     image: newmatheused/ticketsadmin_frontend:latest
     restart: always
     ports:
       - "3000:3000"
     networks:
       - tickets_network
+
 volumes:
   db_data:
+
 networks:
   tickets_network:
     driver: bridge
