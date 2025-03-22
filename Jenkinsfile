@@ -84,7 +84,11 @@ pipeline {
                     sh '''
                         mkdir -p ~/.ssh
                         ssh-keyscan -H 69.62.87.90 >> ~/.ssh/known_hosts
-                        ssh -i "$SSH_KEY" "$SSH_USER"@69.62.87.90 "docker stack deploy -c /home/tickets/docker-compose.yml ticketsadmin"
+                        ssh -i "$SSH_KEY" "$SSH_USER"@69.62.87.90 "
+                            cd /home/tickets &&
+                            git pull &&
+                            docker stack deploy -c docker-compose.yml ticketsadmin
+                        "
                     '''
                 }
             }
