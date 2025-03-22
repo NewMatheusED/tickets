@@ -15,8 +15,8 @@ pipeline {
         stage('Download Docker') {
             steps {
                 sh 'curl -fsSL https://get.docker.com -o get-docker.sh'
-                sh 'sudo sh get-docker.sh'
-                sh 'sudo chmod +x /usr/local/bin/docker-compose'
+                sh 'sh get-docker.sh'
+                sh 'chmod +x /usr/local/bin/docker-compose'
                 sh 'docker --version'
             }
         }
