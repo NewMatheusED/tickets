@@ -80,10 +80,10 @@ pipeline {
         }
         stage('Deploy') {
             steps {
-                // Realiza o deploy na VPS utilizando SSH.
-                // O comando abaixo assume que você possui uma chave SSH configurada no Jenkins e a credencial com id: vps-ssh.
                 withCredentials([sshUserPrivateKey(credentialsId: 'vps-ssh', keyFileVariable: 'SSH_KEY', usernameVariable: 'SSH_USER')]) {
                     sh '''
+                        mkdir -p ~/.ssh
+                        ssh-keyscan -H 69.62.87.90 >> ~/.ssh/known_hosts
                         ssh -i "$SSH_KEY" "$SSH_USER"@69.62.87.90 "docker stack deploy -c /home/tickets/docker-compose.yml ticketsadmin"
                     '''
                 }
