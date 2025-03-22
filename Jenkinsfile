@@ -14,10 +14,11 @@ pipeline {
 
         stage('Download Docker') {
             steps {
-                sh 'curl -fsSL https://get.docker.com -o get-docker.sh'
-                sh 'sh get-docker.sh'
+                sh 'apt-get update && apt-get install -y docker.io'
+                sh 'curl -L "https://github.com/docker/compose/releases/download/$(curl -s https://api.github.com/repos/docker/compose/releases/latest | grep tag_name | cut -d \\" -f 4)/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose'
                 sh 'chmod +x /usr/local/bin/docker-compose'
                 sh 'docker --version'
+                sh 'docker-compose --version'
             }
         }
         stage('Build Images') {
