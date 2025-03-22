@@ -11,6 +11,50 @@ pipeline {
                 checkout scm
             }
         }
+        stage('Prepare .env Files') {
+            steps {
+                withCredentials([
+                    string(credentialsId: 'SECRET_KEY', variable: 'SECRET_KEY'),
+                    string(credentialsId: 'DB_USERNAME', variable: 'DB_USERNAME'),
+                    string(credentialsId: 'DB_PASSWORD', variable: 'DB_PASSWORD'),
+                    string(credentialsId: 'DB_NAME', variable: 'DB_NAME'),
+                    string(credentialsId: 'MYSQL_ROOT_PASSWORD', variable: 'MYSQL_ROOT_PASSWORD'),
+                    string(credentialsId: 'MYSQL_DATABASE', variable: 'MYSQL_DATABASE'),
+                    string(credentialsId: 'MYSQL_USER', variable: 'MYSQL_USER'),
+                    string(credentialsId: 'MYSQL_PASSWORD', variable: 'MYSQL_PASSWORD')
+                    ]) {
+                    writeFile file: '.env', text: """
+                    # Variáveis comuns
+                    SECRET_KEY=${env.SECRET_KEY}
+                    DB_USERNAME=${env.DB_USERNAME}
+                    DB_PASSWORD=${env.DB_PASSWORD}
+                    DB_NAME=${env.DB_NAME}
+                    MYSQL_ROOT_PASSWORD=${env.MYSQL_ROOT_PASSWORD}
+                    MYSQL_DATABASE=${env.MYSQL_DATABASE}
+                    MYSQL_USER=${env.MYSQL_USER}
+                    MYSQL_PASSWORD=${env.MYSQL_PASSWORD}
+                    """
+                    
+                    // Cria o .env no backend
+                    writeFile file: 'backend/.env', text: """
+                    SECRET_KEY=${env.SECRET_KEY}
+                    DB_USERNAME=${env.DB_USERNAME}
+                    DB_PASSWORD=${env.DB_PASSWORD}
+                    DB_NAME=${env.DB_NAME}
+                    MYSQL_ROOT_PASSWORD=${env.MYSQL_ROOT_PASSWORD}
+                    MYSQL_DATABASE=${env.MYSQL_DATABASE}
+                    MYSQL_USER=${env.MYSQL_USER}
+                    MYSQL_PASSWORD=${env.MYSQL_PASSWORD}
+                    """
+                    
+                    // Cria o .env no frontend (adapte conforme as variáveis necessárias)
+                    writeFile file: 'frontend/.env', text: """
+                    REACT_APP_API_URL=${env.REACT_APP_API_URL}
+                    """
+                    // Idem para backend e frontend, se necessário.
+                }
+            }
+        }
         stage('Build Images') {
             steps {
                 // Constrói as imagens conforme o docker-compose.yml
