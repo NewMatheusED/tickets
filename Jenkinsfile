@@ -13,6 +13,8 @@ pipeline {
         }
         stage('Build Images') {
             steps {
+                sh 'pwd'
+                sh 'ls -la'
                 // Constrói as imagens conforme o docker-compose.yml
                 sh 'docker-compose build'
             }
