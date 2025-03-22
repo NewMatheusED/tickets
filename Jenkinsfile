@@ -57,16 +57,15 @@ pipeline {
         }
         stage('Build Images') {
             steps {
-                // Constrói as imagens conforme o docker-compose.yml
-                sh 'docker compose build'
+                sh 'docker compose build --no-cache'  // Força a reconstrução das imagens
+                sh 'docker images'  // Lista as imagens construídas
             }
         }
         stage('Tag and Push Images') {
             steps {
                 script {
-                    // Tagueia as imagens. Certifique-se de que os nomes sejam os mesmos usados na build.
-                    sh 'docker tag ticketsadmin_backend:latest ${DOCKER_HUB_REPO_BACKEND}:latest'
-                    sh 'docker tag ticketsadmin_frontend:latest ${DOCKER_HUB_REPO_FRONTEND}:latest'
+                    sh 'docker tag newmatheused/ticketsadmin_backend:latest ${DOCKER_HUB_REPO_BACKEND}:latest'
+                    sh 'docker tag newmatheused/ticketsadmin_frontend:latest ${DOCKER_HUB_REPO_FRONTEND}:latest'
                     
                     // Login no Docker Hub usando as credenciais armazenadas no Jenkins (ID: dockerhub)
                     withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'DOCKERHUB_USER', passwordVariable: 'DOCKERHUB_PASSWORD')]) {
