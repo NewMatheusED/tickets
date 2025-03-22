@@ -16,7 +16,7 @@ pipeline {
                 sh 'pwd'
                 sh 'ls -la'
                 // Constrói as imagens conforme o docker-compose.yml
-                sh 'docker-compose build'
+                sh 'docker compose build'
             }
         }
         stage('Tag and Push Images') {
