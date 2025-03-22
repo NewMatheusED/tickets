@@ -14,10 +14,9 @@ pipeline {
 
         stage('Download Docker') {
             steps {
-                // Baixa o binário do Docker
                 sh 'curl -fsSL https://get.docker.com -o get-docker.sh'
-                sh 'sh get-docker.sh'
-                sh 'chmod +x /usr/local/bin/docker-compose'
+                sh 'sudo sh get-docker.sh'
+                sh 'sudo chmod +x /usr/local/bin/docker-compose'
                 sh 'docker --version'
             }
         }
