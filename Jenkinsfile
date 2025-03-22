@@ -84,7 +84,7 @@ pipeline {
                 // O comando abaixo assume que você possui uma chave SSH configurada no Jenkins e a credencial com id: vps-ssh.
                 withCredentials([sshUserPrivateKey(credentialsId: 'vps-ssh', keyFileVariable: 'SSH_KEY', usernameVariable: 'SSH_USER')]) {
                     sh '''
-                        ssh -i $SSH_KEY $SSH_USER@69.62.87.90 "docker stack deploy -c /home/tickets/docker-compose.yml ticketsadmin"
+                        ssh -i "$SSH_KEY" "$SSH_USER"@69.62.87.90 "docker stack deploy -c /home/tickets/docker-compose.yml ticketsadmin"
                     '''
                 }
             }
