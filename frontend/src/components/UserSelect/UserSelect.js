@@ -3,21 +3,25 @@ import styles from './UserSelect.module.css';
 
 function UserSelect({ users = [], value, onChange, placeholder = "Selecione um usuário" }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
   const containerRef = useRef(null);
 
-  const selectedUser = users.find(user => String(user.email) === String(value));
+  const selectedUser = users.find(user => String(user.id) === String(value));
+  const filteredUsers = users.filter(user =>
+    user.username.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const handleSelect = (user) => {
-    console.log('user', user);
-    onChange(user.email);
+    onChange(user.id);
     setDropdownOpen(false);
+    setSearchTerm('');
   };
 
-  // Fecha o dropdown ao clicar fora
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (containerRef.current && !containerRef.current.contains(event.target)) {
         setDropdownOpen(false);
+        setSearchTerm('');
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -43,20 +47,31 @@ function UserSelect({ users = [], value, onChange, placeholder = "Selecione um u
       </div>
       {dropdownOpen && (
         <div className={styles.dropdown}>
-          {users.map((user, index) => (
-            <div
-              key={user.email || index}
-              className={styles.option}
-              onClick={() => handleSelect(user)}
-            >
-              <img
-                src={`${process.env.REACT_APP_API_URL}/static/uploads/${user.profile_picture}`}
-                alt={user.username}
-                className={styles.avatar}
-              />
-              <span>{user.username}</span>
-            </div>
-          ))}
+          <input 
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Pesquisar..."
+            className={styles.searchInput}
+          />
+          {filteredUsers.length > 0 ? (
+            filteredUsers.map((user, index) => (
+              <div
+                key={user.id || index}
+                className={styles.option}
+                onClick={() => handleSelect(user)}
+              >
+                <img
+                  src={`${process.env.REACT_APP_API_URL}/static/uploads/${user.profile_picture}`}
+                  alt={user.username}
+                  className={styles.avatar}
+                />
+                <span>{user.username}</span>
+              </div>
+            ))
+          ) : (
+            <div className={styles.noResults}>Nenhum usuário encontrado</div>
+          )}
         </div>
       )}
     </div>

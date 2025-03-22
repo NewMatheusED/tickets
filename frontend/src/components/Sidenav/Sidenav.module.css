@@ -4,6 +4,9 @@
     height: 100vh;
     padding: 1rem;
     transition: width 300ms;
+    overflow-y: auto;
+    position: fixed;
+    z-index: 999;
 }
 
 .navExpanded {

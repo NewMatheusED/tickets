@@ -6,7 +6,7 @@ function Layout() {
     return (
         <div style={{ display: 'flex' }}>
             <SideNav />
-            <div style={{ flex: 1 }}>
+            <div style={{ flex: 1, marginLeft: '112px' }}>
                 <Outlet />
             </div>
         </div>

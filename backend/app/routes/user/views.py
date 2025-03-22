@@ -14,6 +14,7 @@ def get_users():
         users_list.append({
             'username': user.username,
             'email': user.email,
-            'profile_picture': user.profile_picture
+            'profile_picture': user.profile_picture,
+            'id': user.id
         })
     return jsonify(users_list)

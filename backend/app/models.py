@@ -16,3 +16,8 @@ class Tickets(db.Model):
     ticket_status = db.Column(db.String(64), default='open')
     ticket_date = db.Column(db.DateTime, index=True, default=db.func.current_timestamp())
     observation = db.Column(db.String(256))
+    title = db.Column(db.String(64))
+    type_error = db.Column(db.String(64))
+    solicitante = db.Column(db.String(128))
+    chamado_externo = db.Column(db.String(64))
+    setor = db.Column(db.String(64))

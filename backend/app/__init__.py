@@ -21,11 +21,13 @@ def create_app():
         from app.routes.register.views import register_bp
         from app.routes.config.views import config_bp
         from app.routes.user.views import user_bp
+        from app.routes.tickets.views import tickets_bp
         
     app.register_blueprint(auth_bp)
     app.register_blueprint(login_bp)
     app.register_blueprint(register_bp)
     app.register_blueprint(config_bp)
     app.register_blueprint(user_bp)
+    app.register_blueprint(tickets_bp)
 
     return app
