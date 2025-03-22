@@ -34,7 +34,8 @@
     padding: 0.75rem;
     border-radius: 4px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    z-index: 999;
+    z-index: 99;
+    position: relative;
   }
   .modalOverlay {
     position: fixed;
@@ -202,5 +203,115 @@
 
 .ticketId {
   font-size: 0.9rem;
-  color: gray;
+  color: #808080;
+}
+
+.customCheckbox {
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  position: absolute;
+  left: 5%;
+  top: 5%;
+}
+
+.customCheckbox input {
+  display: none;
+}
+
+.customCheckbox svg {
+  overflow: visible;
+}
+
+.path {
+  fill: none;
+  stroke: #808080;
+  stroke-width: 6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: stroke-dasharray 0.5s ease, stroke-dashoffset 0.5s ease;
+  stroke-dasharray: 241 9999999;
+  stroke-dashoffset: 0;
+}
+
+.customCheckbox input:checked ~ svg .path {
+  stroke-dasharray: 70.51 9999999;
+  stroke-dashoffset: -262.27;
+}
+
+/* Substitua a animação atual do botão de deleção por essa */
+.deleteContainer {
+  overflow: hidden;
+  width: 0;
+  transition: width 0.3s ease;
+  white-space: nowrap;
+}
+
+.deleteContainerExpanded {
+  overflow: hidden;
+  width: 250px;
+  transition: width 0.3s ease;
+  white-space: nowrap;
+}
+
+
+/* Dê um destaque sutil ao cartão em atraso */
+.ticketCard.delayed {
+  box-shadow: 0 0 8px 2px rgba(0,0,0,0.1);
+  border-left: 6px solid;
+
+}
+
+/* Indicador de atraso (bolinha) */
+.delayIndicator {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  cursor: default;
+}
+  
+/* Garanta que o ticketCard tenha position relativa para posicionar o indicador */
+.ticketCard {
+  position: relative;
+  /* ... demais estilos do ticketCard ... */
+}
+
+/* Container para posicionar o tooltip e a bolinha */
+.delayIndicatorContainer {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  display: flex;
+  align-items: center;
+}
+
+/* A bolinha permanece como antes */
+.delayIndicator {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+}
+
+/* Tooltip inicia escondido, sem quebrar o texto */
+.delayTooltip {
+  background: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  font-size: 14px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  white-space: nowrap;
+  margin-right: 25px;
+  opacity: 0;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+/* Ao hover no container, o tooltip aparece animadamente da direita para a esquerda */
+.delayIndicatorContainer:hover .delayTooltip {
+  opacity: 1;
+  transform: scaleX(1);
 }

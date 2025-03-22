@@ -47,3 +47,11 @@ class Controller:
                 'setor': ticket.setor
             })
         return result
+    
+    def deleteTicket(self, ticket_id):
+        ticket = Tickets.query.filter_by(ticket_id_hash=ticket_id).first()
+        if not ticket:
+            return {'message': 'Ticket not found'}, 404
+        db.session.delete(ticket)
+        db.session.commit()
+        return {'message': 'Ticket deleted successfully'}, 200
