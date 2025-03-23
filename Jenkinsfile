@@ -55,6 +55,7 @@ pipeline {
                         ssh "$SSH_USER"@69.62.87.90 "
                             cd /home/tickets &&
                             git pull &&
+                            docker network create --driver overlay tickets_network &&
                             docker stack deploy -c docker-compose.yml ticketsadmin
                         "
                         ssh-agent -k
