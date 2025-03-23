@@ -35,12 +35,12 @@ pipeline {
         stage('Tag and Push Images') {
             steps {
                 script {
-                    sh '''
-                        docker tag backend:latest ${DOCKER_HUB_REPO_BACKEND}:latest
-                        docker tag frontend:latest ${DOCKER_HUB_REPO_FRONTEND}:latest
-                        docker push ${DOCKER_HUB_REPO_BACKEND}:latest
-                        docker push ${DOCKER_HUB_REPO_FRONTEND}:latest
-                    '''
+                    sh '''  
+                    docker tag newmatheused/ticketsadmin_backend:latest ${DOCKER_HUB_REPO_BACKEND}:latest 
+                    docker tag newmatheused/ticketsadmin_frontend:latest ${DOCKER_HUB_REPO_FRONTEND}:latest
+                    docker push ${DOCKER_HUB_REPO_BACKEND}:latest
+                    docker push ${DOCKER_HUB_REPO_FRONTEND}:latest
+                    ''' 
                 }
             }
         }
