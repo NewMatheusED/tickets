@@ -11,27 +11,32 @@ services:
       - db_data:/var/lib/mysql
     networks:
       - tickets_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      retries: 5
 
   backend:
-    build: ./backend  # Diretório onde está o Dockerfile do backend
+    build: ./backend
     image: newmatheused/ticketsadmin_backend:latest
     restart: always
     environment:
       SECRET_KEY: "${SECRET_KEY}"
-      DB_USERNAME: "${DB_USERNAME}"
-      DB_PASSWORD: "${DB_PASSWORD}"
+      DB_USERNAME: "${MYSQL_USER}"
+      DB_PASSWORD: "${MYSQL_PASSWORD}"
       DB_HOST: db
       DB_PORT: 3306
-      DB_NAME: "${DB_NAME}"
+      DB_NAME: "${MYSQL_DATABASE}"
     ports:
       - "5000:5000"
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     networks:
       - tickets_network
 
   frontend:
-    build: ./frontend  # Diretório onde está o Dockerfile do frontend
+    build: ./frontend
     image: newmatheused/ticketsadmin_frontend:latest
     restart: always
     ports:

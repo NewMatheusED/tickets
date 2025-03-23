@@ -1,4 +1,3 @@
-//// filepath: Jenkinsfile
 pipeline {
     agent any
     environment {
@@ -13,68 +12,35 @@ pipeline {
         }
         stage('Prepare .env Files') {
             steps {
-                withCredentials([
-                    string(credentialsId: 'SECRET_KEY', variable: 'SECRET_KEY'),
-                    string(credentialsId: 'DB_USERNAME', variable: 'DB_USERNAME'),
-                    string(credentialsId: 'DB_PASSWORD', variable: 'DB_PASSWORD'),
-                    string(credentialsId: 'DB_NAME', variable: 'DB_NAME'),
-                    string(credentialsId: 'MYSQL_ROOT_PASSWORD', variable: 'MYSQL_ROOT_PASSWORD'),
-                    string(credentialsId: 'MYSQL_DATABASE', variable: 'MYSQL_DATABASE'),
-                    string(credentialsId: 'MYSQL_USER', variable: 'MYSQL_USER'),
-                    string(credentialsId: 'MYSQL_PASSWORD', variable: 'MYSQL_PASSWORD')
-                    ]) {
-                    writeFile file: '.env', text: """
-                    # Variáveis comuns
-                    SECRET_KEY=${env.SECRET_KEY}
-                    DB_USERNAME=${env.DB_USERNAME}
-                    DB_PASSWORD=${env.DB_PASSWORD}
-                    DB_NAME=${env.DB_NAME}
-                    MYSQL_ROOT_PASSWORD=${env.MYSQL_ROOT_PASSWORD}
-                    MYSQL_DATABASE=${env.MYSQL_DATABASE}
-                    MYSQL_USER=${env.MYSQL_USER}
-                    MYSQL_PASSWORD=${env.MYSQL_PASSWORD}
-                    """
-                    
-                    // Cria o .env no backend
-                    writeFile file: 'backend/.env', text: """
-                    SECRET_KEY=${env.SECRET_KEY}
-                    DB_USERNAME=${env.DB_USERNAME}
-                    DB_PASSWORD=${env.DB_PASSWORD}
-                    DB_NAME=${env.DB_NAME}
-                    MYSQL_ROOT_PASSWORD=${env.MYSQL_ROOT_PASSWORD}
-                    MYSQL_DATABASE=${env.MYSQL_DATABASE}
-                    MYSQL_USER=${env.MYSQL_USER}
-                    MYSQL_PASSWORD=${env.MYSQL_PASSWORD}
-                    """
-                    
-                    // Cria o .env no frontend (adapte conforme as variáveis necessárias)
-                    writeFile file: 'frontend/.env', text: """
-                    REACT_APP_API_URL=${env.REACT_APP_API_URL}
-                    """
-                    // Idem para backend e frontend, se necessário.
+                withCredentials([file(credentialsId: 'env-file', variable: 'ENV_FILE')]) {
+                    sh 'cp $ENV_FILE .env'
+                    sh 'cp $ENV_FILE backend/.env'
+                    sh 'cp $ENV_FILE frontend/.env'
+                }
+            }
+        }
+        stage('Login to Docker Hub') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'DOCKERHUB_USER', passwordVariable: 'DOCKERHUB_PASSWORD')]) {
+                    sh 'echo "$DOCKERHUB_PASSWORD" | docker login -u "$DOCKERHUB_USER" --password-stdin'
                 }
             }
         }
         stage('Build Images') {
             steps {
-                sh 'docker compose build --no-cache'  // Força a reconstrução das imagens
-                sh 'docker images'  // Lista as imagens construídas
+                sh 'docker compose build --no-cache'
+                sh 'docker images'
             }
         }
         stage('Tag and Push Images') {
             steps {
                 script {
-                    sh 'docker tag newmatheused/ticketsadmin_backend:latest ${DOCKER_HUB_REPO_BACKEND}:latest'
-                    sh 'docker tag newmatheused/ticketsadmin_frontend:latest ${DOCKER_HUB_REPO_FRONTEND}:latest'
-                    
-                    // Login no Docker Hub usando as credenciais armazenadas no Jenkins (ID: dockerhub)
-                    withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'DOCKERHUB_USER', passwordVariable: 'DOCKERHUB_PASSWORD')]) {
-                        sh 'docker login -u $DOCKERHUB_USER -p $DOCKERHUB_PASSWORD'
-                    }
-                    
-                    // Envia as imagens para o Docker Hub
-                    sh 'docker push ${DOCKER_HUB_REPO_BACKEND}:latest'
-                    sh 'docker push ${DOCKER_HUB_REPO_FRONTEND}:latest'
+                    sh '''
+                        docker tag backend:latest ${DOCKER_HUB_REPO_BACKEND}:latest
+                        docker tag frontend:latest ${DOCKER_HUB_REPO_FRONTEND}:latest
+                        docker push ${DOCKER_HUB_REPO_BACKEND}:latest
+                        docker push ${DOCKER_HUB_REPO_FRONTEND}:latest
+                    '''
                 }
             }
         }
@@ -84,19 +50,24 @@ pipeline {
                     sh '''
                         mkdir -p ~/.ssh
                         ssh-keyscan -H 69.62.87.90 >> ~/.ssh/known_hosts
-                        ssh -i "$SSH_KEY" "$SSH_USER"@69.62.87.90 "
+                        eval "$(ssh-agent -s)"
+                        ssh-add "$SSH_KEY"
+                        ssh "$SSH_USER"@69.62.87.90 "
                             cd /home/tickets &&
                             git pull &&
                             docker stack deploy -c docker-compose.yml ticketsadmin
                         "
+                        ssh-agent -k
                     '''
                 }
             }
         }
         stage('Clean Up') {
             steps {
-                // Remove imagens "dangling" (sem tag) e containers parados
-                sh 'docker system prune -af'
+                sh '''
+                    docker image prune -f
+                    docker container prune -f
+                '''
             }
         }
     }
