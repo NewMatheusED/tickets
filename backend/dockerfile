@@ -1,7 +1,17 @@
 FROM python:3.9-slim
 WORKDIR /app
+
+# Instala dependências
 COPY requirements.txt .
 RUN pip install --upgrade pip && pip install -r requirements.txt
+
+# Copia código e scripts
 COPY . .
+COPY wait-for-db.sh /wait-for-db.sh
+RUN chmod +x /wait-for-db.sh
+
+# Expõe a porta 5000
 EXPOSE 5000
-CMD ["python", "run.py"]
+
+# Usa Gunicorn para rodar o app em produção
+CMD ["/wait-for-db.sh", "gunicorn", "-b", "0.0.0.0:5000", "run:app"]
