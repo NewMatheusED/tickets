@@ -49,3 +49,4 @@ volumes:
 networks:
   tickets_network:
     driver: overlay
+    attachable: true  # Permite que containers individuais se conectem a essa rede
