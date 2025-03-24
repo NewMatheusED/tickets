@@ -50,38 +50,35 @@ pipeline {
         }
         stage('Deploy') {
             steps {
-                withCredentials([sshUserPrivateKey(credentialsId: 'vps-ssh', keyFileVariable: 'SSH_KEY', usernameVariable: 'SSH_USER')]) {
+                withCredentials([string(credentialsId: 'vps-ssh-password', variable: 'SSH_PASSWORD'), string(credentialsId: 'vps-ssh-user', variable: 'SSH_USER')]) {
                     sh '''
                         set -e  # Para o script em caso de erro
 
-                        # Criação do diretório para as chaves SSH
+                        # Criação do diretório para as chaves SSH (aqui, você pode omitir a parte de chave privada)
                         mkdir -p ~/.ssh
 
                         # Adiciona o host à lista de conhecidos
                         ssh-keyscan -H 69.62.87.90 >> ~/.ssh/known_hosts
 
-                        # Criação da chave SSH privada
-                        echo "$SSH_KEY" > ~/.ssh/id_rsa
-                        chmod 600 ~/.ssh/id_rsa
-
-                        # Realiza a conexão SSH com a chave privada diretamente, sem precisar de terminal interativo
-                        ssh -i Aloi@3781152 "$SSH_USER"@69.62.87.90 "cd /home/tickets && git reset --hard origin/main && git pull origin main"
+                        # Usando sshpass para passar a senha diretamente para o comando SSH
+                        sshpass -p "Aloi@3781152" ssh -o StrictHostKeyChecking=no "$SSH_USER"@69.62.87.90 "cd /home/tickets && git reset --hard origin/main && git pull origin main"
 
                         # Copiar os arquivos para a VPS
                         echo "Copiando arquivos para a VPS"
-                        scp -i Aloi@3781152 .env "$SSH_USER"@69.62.87.90:/home/tickets/.env
-                        scp -i Aloi@3781152 backend/.env "$SSH_USER"@69.62.87.90:/home/tickets/backend/.env
-                        scp -i Aloi@3781152 frontend/.env "$SSH_USER"@69.62.87.90:/home/tickets/frontend/.env
+                        sshpass -p "Aloi@3781152" scp .env "$SSH_USER"@69.62.87.90:/home/tickets/.env
+                        sshpass -p "Aloi@3781152" scp backend/.env "$SSH_USER"@69.62.87.90:/home/tickets/backend/.env
+                        sshpass -p "Aloi@3781152" scp frontend/.env "$SSH_USER"@69.62.87.90:/home/tickets/frontend/.env
 
                         # Verifica e cria a rede, se necessário
-                        ssh -i Aloi@3781152 "$SSH_USER"@69.62.87.90 "cd /home/tickets && docker network ls | grep -q tickets_network || docker network create --driver overlay --attachable tickets_network"
+                        sshpass -p "Aloi@3781152" ssh -o StrictHostKeyChecking=no "$SSH_USER"@69.62.87.90 "cd /home/tickets && docker network ls | grep -q tickets_network || docker network create --driver overlay --attachable tickets_network"
 
                         # Faz o deploy do stack no Docker Swarm
-                        ssh -i Aloi@3781152 "$SSH_USER"@69.62.87.90 "cd /home/tickets && docker stack deploy -c docker-compose.yml ticketsadmin"
+                        sshpass -p "Aloi@3781152" ssh -o StrictHostKeyChecking=no "$SSH_USER"@69.62.87.90 "cd /home/tickets && docker stack deploy -c docker-compose.yml ticketsadmin"
                     '''
                 }
             }
         }
+
 
 
         stage('Clean Up') {
