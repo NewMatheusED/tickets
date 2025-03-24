@@ -54,34 +54,35 @@ pipeline {
                     sh '''
                         set -e  # Para o script em caso de erro
 
+                        # Criação do diretório para as chaves SSH
                         mkdir -p ~/.ssh
+
+                        # Adiciona o host à lista de conhecidos
                         ssh-keyscan -H 69.62.87.90 >> ~/.ssh/known_hosts
 
-                        eval "$(ssh-agent -s)"
-                        ssh-add "$SSH_KEY"
+                        # Verifica se a chave SSH foi adicionada corretamente
+                        echo "$SSH_KEY" > ~/.ssh/id_rsa
+                        chmod 600 ~/.ssh/id_rsa
 
-                        # Entra no diretório onde está o arquivo docker-compose.yml
-                        ssh -t "$SSH_USER"@69.62.87.90 "cd /home/tickets && git reset --hard origin/main && git pull origin main"
-                        
-                        pwd
+                        # Realiza a conexão SSH
+                        ssh -o StrictHostKeyChecking=no -t "$SSH_USER"@69.62.87.90 "cd /home/tickets && git reset --hard origin/main && git pull origin main"
+
+                        # Copiar os arquivos para a VPS
                         echo "Copiando arquivos para a VPS"
-                        ls -la
-                        # Copia o arquivo .env para a VPS no diretório correto
                         scp .env "$SSH_USER"@69.62.87.90:/home/tickets/.env
                         scp backend/.env "$SSH_USER"@69.62.87.90:/home/tickets/backend/.env
                         scp frontend/.env "$SSH_USER"@69.62.87.90:/home/tickets/frontend/.env
-                        
+
                         # Verifica e cria a rede, se necessário
                         ssh -t "$SSH_USER"@69.62.87.90 "cd /home/tickets && docker network ls | grep -q tickets_network || docker network create --driver overlay --attachable tickets_network"
 
                         # Faz o deploy do stack no Docker Swarm
                         ssh -t "$SSH_USER"@69.62.87.90 "cd /home/tickets && docker stack deploy -c docker-compose.yml ticketsadmin"
-
-                        ssh-agent -k
                     '''
                 }
             }
         }
+
         stage('Clean Up') {
             steps {
                 sh '''
