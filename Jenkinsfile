@@ -63,6 +63,9 @@ pipeline {
                         # Entra no diretório onde está o arquivo docker-compose.yml
                         ssh -t "$SSH_USER"@69.62.87.90 "cd /home/tickets && git reset --hard origin/main && git pull origin main"
                         
+                        pwd
+                        echo "Copiando arquivos para a VPS"
+                        ls -la
                         # Copia o arquivo .env para a VPS no diretório correto
                         scp .env "$SSH_USER"@69.62.87.90:/home/tickets/.env
                         scp backend/.env "$SSH_USER"@69.62.87.90:/home/tickets/backend/.env
