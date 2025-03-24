@@ -13,6 +13,7 @@ pipeline {
         stage('Prepare .env Files') {
             steps {
                 withCredentials([file(credentialsId: 'env-file', variable: 'ENV_FILE')]) {
+                    sh 'rm -f .env backend/.env frontend/.env'
                     sh 'cp "$ENV_FILE" .env'
                     sh 'cp "$ENV_FILE" backend/.env'
                     sh 'cp "$ENV_FILE" frontend/.env'
