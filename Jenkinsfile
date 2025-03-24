@@ -50,28 +50,28 @@ pipeline {
                 withCredentials([sshUserPrivateKey(credentialsId: 'vps-ssh', keyFileVariable: 'SSH_KEY', usernameVariable: 'SSH_USER')]) {
                     sh '''
                         set -e  # Para o script em caso de erro
-                        
+
                         mkdir -p ~/.ssh
                         ssh-keyscan -H 69.62.87.90 >> ~/.ssh/known_hosts
 
                         eval "$(ssh-agent -s)"
                         ssh-add "$SSH_KEY"
 
-                        ssh "$SSH_USER"@69.62.87.90 << EOF
-                            set -e  # Para o script remoto em caso de erro
-                            cd /home/tickets
+                        ssh "$SSH_USER"@69.62.87.90 << 'EOF'
+                        set -e  # Para o script remoto em caso de erro
+                        cd /home/tickets
 
-                            # Força o reset do repositório e puxa a versão mais recente
-                            git reset --hard origin/main
-                            git pull origin main
+                        # Força o reset do repositório e puxa a versão mais recente
+                        git reset --hard origin/main
+                        git pull origin main
 
-                            # Verifica se a rede já existe antes de criar
-                            if ! docker network ls | grep -q tickets_network; then
-                                docker network create --driver overlay --attachable tickets_network || true
-                            fi
+                        # Verifica se a rede já existe antes de criar
+                        if ! docker network ls | grep -q tickets_network; then
+                            docker network create --driver overlay --attachable tickets_network || true
+                        fi
 
-                            # Faz o deploy com o Swarm
-                            docker stack deploy -c docker-compose.yml ticketsadmin
+                        # Faz o deploy com o Swarm
+                        docker stack deploy -c docker-compose.yml ticketsadmin
                         EOF
 
                         ssh-agent -k
