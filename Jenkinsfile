@@ -13,6 +13,9 @@ pipeline {
         stage('Prepare .env Files') {
             steps {
                 withCredentials([file(credentialsId: 'env-file', variable: 'ENV_FILE')]) {
+                    sh 'ls -la'
+                    sh 'pwd'
+                    sh 'echo "Criando arquivos .env"'
                     sh 'rm -f .env backend/.env frontend/.env'
                     sh 'cp "$ENV_FILE" .env'
                     sh 'cp "$ENV_FILE" backend/.env'
@@ -60,10 +63,15 @@ pipeline {
                         # Entra no diretório onde está o arquivo docker-compose.yml
                         ssh -t "$SSH_USER"@69.62.87.90 "cd /home/tickets && git reset --hard origin/main && git pull origin main"
                         
+                        # Copia o arquivo .env para a VPS no diretório correto
+                        scp .env "$SSH_USER"@69.62.87.90:/home/tickets/.env
+                        scp backend/.env "$SSH_USER"@69.62.87.90:/home/tickets/backend/.env
+                        scp frontend/.env "$SSH_USER"@69.62.87.90:/home/tickets/frontend/.env
+                        
                         # Verifica e cria a rede, se necessário
                         ssh -t "$SSH_USER"@69.62.87.90 "cd /home/tickets && docker network ls | grep -q tickets_network || docker network create --driver overlay --attachable tickets_network"
 
-                        # Faz o deploy do stack
+                        # Faz o deploy do stack no Docker Swarm
                         ssh -t "$SSH_USER"@69.62.87.90 "cd /home/tickets && docker stack deploy -c docker-compose.yml ticketsadmin"
 
                         ssh-agent -k
