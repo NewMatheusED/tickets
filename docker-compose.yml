@@ -1,3 +1,4 @@
+version: "3.8"
 services:
   db:
     image: mysql:8
@@ -29,10 +30,12 @@ services:
       DB_NAME: "${MYSQL_DATABASE}"
     ports:
       - "5000:5000"
-    depends_on:
-      - db
     networks:
       - tickets_network
+    # Pode-se usar o healthcheck para garantir que o backend só suba quando o db estiver pronto
+    depends_on:
+      - db
+    entrypoint: /wait-for-db.sh  # Usar um script de espera para o banco de dados
 
   frontend:
     build: ./frontend

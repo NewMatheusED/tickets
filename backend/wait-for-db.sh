@@ -1,7 +1,16 @@
 #!/bin/bash
-echo "Aguardando MySQL..."
-while ! nc -z db 3306; do
-  sleep 3
+# wait-for-db.sh
+
+set -e
+
+host="$1"
+shift
+cmd="$@"
+
+until mysqladmin ping -h "$host" --silent; do
+  >&2 echo "Aguardando o banco de dados estar disponível..."
+  sleep 1
 done
-echo "MySQL está pronto!"
-exec "$@"
+
+>&2 echo "Banco de dados pronto. Iniciando o backend."
+exec $cmd
