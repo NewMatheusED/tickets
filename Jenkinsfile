@@ -70,9 +70,6 @@ pipeline {
                                 docker network create --driver overlay --attachable tickets_network || true
                             fi
 
-                            # Corrigindo a criação da rede para o Swarm
-
-
                             # Faz o deploy com o Swarm
                             docker stack deploy -c docker-compose.yml ticketsadmin
                         EOF
