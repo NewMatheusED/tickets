@@ -57,11 +57,14 @@ pipeline {
                         eval "$(ssh-agent -s)"
                         ssh-add "$SSH_KEY"
 
+                        # Entra no diretório onde está o arquivo docker-compose.yml
                         ssh -t "$SSH_USER"@69.62.87.90 "cd /home/tickets && git reset --hard origin/main && git pull origin main"
                         
-                        ssh -t "$SSH_USER"@69.62.87.90 "docker network ls | grep -q tickets_network || docker network create --driver overlay --attachable tickets_network"
+                        # Verifica e cria a rede, se necessário
+                        ssh -t "$SSH_USER"@69.62.87.90 "cd /home/tickets && docker network ls | grep -q tickets_network || docker network create --driver overlay --attachable tickets_network"
 
-                        ssh -t "$SSH_USER"@69.62.87.90 "docker stack deploy -c docker-compose.yml ticketsadmin"
+                        # Faz o deploy do stack
+                        ssh -t "$SSH_USER"@69.62.87.90 "cd /home/tickets && docker stack deploy -c docker-compose.yml ticketsadmin"
 
                         ssh-agent -k
                     '''
