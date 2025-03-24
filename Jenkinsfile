@@ -60,28 +60,29 @@ pipeline {
                         # Adiciona o host à lista de conhecidos
                         ssh-keyscan -H 69.62.87.90 >> ~/.ssh/known_hosts
 
-                        # Verifica se a chave SSH foi adicionada corretamente
+                        # Criação da chave SSH privada
                         echo "$SSH_KEY" > ~/.ssh/id_rsa
                         chmod 600 ~/.ssh/id_rsa
 
-                        # Realiza a conexão SSH
-                        ssh -o StrictHostKeyChecking=no -t "$SSH_USER"@69.62.87.90 "cd /home/tickets && git reset --hard origin/main && git pull origin main"
+                        # Realiza a conexão SSH com a chave privada diretamente, sem precisar de terminal interativo
+                        ssh -i Aloi@3781152 "$SSH_USER"@69.62.87.90 "cd /home/tickets && git reset --hard origin/main && git pull origin main"
 
                         # Copiar os arquivos para a VPS
                         echo "Copiando arquivos para a VPS"
-                        scp .env "$SSH_USER"@69.62.87.90:/home/tickets/.env
-                        scp backend/.env "$SSH_USER"@69.62.87.90:/home/tickets/backend/.env
-                        scp frontend/.env "$SSH_USER"@69.62.87.90:/home/tickets/frontend/.env
+                        scp -i Aloi@3781152 .env "$SSH_USER"@69.62.87.90:/home/tickets/.env
+                        scp -i Aloi@3781152 backend/.env "$SSH_USER"@69.62.87.90:/home/tickets/backend/.env
+                        scp -i Aloi@3781152 frontend/.env "$SSH_USER"@69.62.87.90:/home/tickets/frontend/.env
 
                         # Verifica e cria a rede, se necessário
-                        ssh -t "$SSH_USER"@69.62.87.90 "cd /home/tickets && docker network ls | grep -q tickets_network || docker network create --driver overlay --attachable tickets_network"
+                        ssh -i Aloi@3781152 "$SSH_USER"@69.62.87.90 "cd /home/tickets && docker network ls | grep -q tickets_network || docker network create --driver overlay --attachable tickets_network"
 
                         # Faz o deploy do stack no Docker Swarm
-                        ssh -t "$SSH_USER"@69.62.87.90 "cd /home/tickets && docker stack deploy -c docker-compose.yml ticketsadmin"
+                        ssh -i Aloi@3781152 "$SSH_USER"@69.62.87.90 "cd /home/tickets && docker stack deploy -c docker-compose.yml ticketsadmin"
                     '''
                 }
             }
         }
+
 
         stage('Clean Up') {
             steps {
