@@ -29,10 +29,12 @@ services:
       - "5000:5000"
     networks:
       - tickets_network
-    # Pode-se usar o healthcheck para garantir que o backend só suba quando o db estiver pronto
     depends_on:
       - db
-    entrypoint: /wait-for-db.sh  # Usar um script de espera para o banco de dados
+    entrypoint: /wait-for-db.sh  # Aguardar o banco estar pronto antes de iniciar o backend
+    volumes:
+      - ./wait-for-db.sh:/wait-for-db.sh  # Montando o script no container
+    working_dir: / # Garantir que o script tenha permissão de execução no diretório correto
 
   frontend:
     image: newmatheused/ticketsadmin_frontend:latest
