@@ -67,8 +67,11 @@ pipeline {
 
                             # Verifica se a rede já existe antes de criar
                             if ! docker network ls | grep -q tickets_network; then
-                                docker network create --driver overlay tickets_network
+                                docker network create --driver overlay --attachable tickets_network || true
                             fi
+
+                            # Corrigindo a criação da rede para o Swarm
+
 
                             # Faz o deploy com o Swarm
                             docker stack deploy -c docker-compose.yml ticketsadmin
