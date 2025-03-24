@@ -2,7 +2,6 @@ version: "3.8"
 services:
   db:
     image: mysql:8
-    restart: always
     environment:
       MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
       MYSQL_DATABASE: "${MYSQL_DATABASE}"
@@ -18,9 +17,7 @@ services:
       retries: 5
 
   backend:
-    build: ./backend
     image: newmatheused/ticketsadmin_backend:latest
-    restart: always
     environment:
       SECRET_KEY: "${SECRET_KEY}"
       DB_USERNAME: "${MYSQL_USER}"
@@ -38,9 +35,7 @@ services:
     entrypoint: /wait-for-db.sh  # Usar um script de espera para o banco de dados
 
   frontend:
-    build: ./frontend
     image: newmatheused/ticketsadmin_frontend:latest
-    restart: always
     ports:
       - "3000:3000"
     networks:
