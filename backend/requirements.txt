@@ -11,3 +11,4 @@ bcrypt
 flask-marshmallow
 flask-migrate
 marshmallow-sqlalchemy
+cryptography
