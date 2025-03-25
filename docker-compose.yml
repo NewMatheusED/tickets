@@ -31,10 +31,6 @@ services:
       - tickets_network
     depends_on:
       - db
-    entrypoint: /wait-for-db.sh  # Aguardar o banco estar pronto antes de iniciar o backend
-    volumes:
-      - ./wait-for-db.sh:/wait-for-db.sh  # Montando o script no container
-    working_dir: / # Garantir que o script tenha permissão de execução no diretório correto
 
   frontend:
     image: newmatheused/ticketsadmin_frontend:latest

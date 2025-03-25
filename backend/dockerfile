@@ -9,4 +9,4 @@ RUN pip install --upgrade pip && pip install -r requirements.txt
 EXPOSE 5000
 
 # Usa Gunicorn para rodar o app em produção
-CMD ["/wait-for-db.sh", "gunicorn", "-b", "0.0.0.0:5000", "run:app"]
+CMD ["gunicorn", "-b", "0.0.0.0:5000", "run:app"]
