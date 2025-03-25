@@ -72,10 +72,10 @@ pipeline {
                         scp frontend/.env "$SSH_USER"@69.62.87.90:/home/tickets/frontend/.env
                         
                         # Verifica e cria a rede, se necessário
-                        ssh -t "$SSH_USER"@69.62.87.90 "cd /home/tickets && docker network ls | grep -q tickets_network || docker network create --driver overlay --attachable tickets_network"
+                        # ssh -t "$SSH_USER"@69.62.87.90 "cd /home/tickets && docker network ls | grep -q tickets_network || docker network create --driver overlay --attachable tickets_network"
 
                         # Faz o deploy do stack no Docker Swarm
-                        ssh -t "$SSH_USER"@69.62.87.90 "cd /home/tickets && docker stack deploy -c docker-compose.yml ticketsadmin"
+                        # ssh -t "$SSH_USER"@69.62.87.90 "cd /home/tickets && docker stack deploy -c docker-compose.yml ticketsadmin"
 
                         ssh-agent -k
                     '''
