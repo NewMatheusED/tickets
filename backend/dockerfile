@@ -5,8 +5,9 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --upgrade pip && pip install -r requirements.txt
 
-# Expõe a porta 5000
+# Copia todo o restante do código da aplicação
+COPY . .
+
 EXPOSE 5000
 
-# Usa Gunicorn para rodar o app em produção
 CMD ["gunicorn", "-b", "0.0.0.0:5000", "run:app"]
