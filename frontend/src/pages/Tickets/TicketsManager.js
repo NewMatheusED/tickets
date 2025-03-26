@@ -12,7 +12,8 @@ function TicketsManager() {
   const [users, setUsers] = useState([]);
   const [filters, setFilters] = useState({
     user: '',
-    search: ''
+    search: '',
+    delay: ''
   });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedTickets, setSelectedTickets] = useState([]);
@@ -131,9 +132,20 @@ function TicketsManager() {
   const filteredTickets = tickets.filter(ticket => {
     const matchesUser = filters.user ? String(ticket.user_id) === String(filters.user) : true;
     const matchesSearch = filters.search
-      ? ticket.id?.toLowerCase().includes(filters.search.toLowerCase()) || ticket.title?.toLowerCase().includes(filters.search.toLowerCase())
+      ? ticket.id?.toString().toLowerCase().includes(filters.search.toLowerCase()) ||
+        ticket.title?.toLowerCase().includes(filters.search.toLowerCase())
       : true;
-    return matchesUser && matchesSearch;
+    const delayInfo = getDelayInfo(ticket);
+    const matchesDelay = filters.delay === ''
+      ? true
+      : filters.delay === 'no'
+        ? !delayInfo
+        : filters.delay === 'yellow'
+          ? delayInfo && delayInfo.color === '#ffc107'
+          : filters.delay === 'red'
+            ? delayInfo && delayInfo.color === '#dc3545'
+            : true;
+    return matchesUser && matchesSearch && matchesDelay;
   });
 
   // Agrupa tickets por status
@@ -278,7 +290,17 @@ function TicketsManager() {
             onChange={(newUserId) => setFilters({ ...filters, user: newUserId })}
             placeholder="Todos Usuários"
           />
-          <Button onClick={() => setFilters({ status: '', user: '', search: '' })}>
+          <select
+            className={styles.customSelect}
+            value={filters.delay}
+            onChange={(e) => setFilters({ ...filters, delay: e.target.value })}
+          >
+            <option value="">Todos</option>
+            <option value="no">Sem Atraso</option>
+            <option value="yellow">Atraso Amarelo</option>
+            <option value="red">Atraso Vermelho</option>
+          </select>
+          <Button onClick={() => setFilters({ status: '', user: '', search: '', delay: '' })}>
             Limpar Filtros
           </Button>
         </div>
@@ -334,7 +356,7 @@ function TicketsManager() {
                     {assignedUser && (
                       <div className={styles.assignedUser}>
                         <img
-                          src={`${process.env.REACT_APP_API_URL}/static/uploads/${assignedUser.profile_picture}`}
+                          src={`/media/${assignedUser.profile_picture}`}
                           alt={assignedUser.username}
                           className={styles.avatar}
                         />

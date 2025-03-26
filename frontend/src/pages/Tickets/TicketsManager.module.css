@@ -315,3 +315,16 @@
   opacity: 1;
   transform: scaleX(1);
 }
+
+.customSelect {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: #fff;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+}
+
+.customSelect::placeholder {
+  color: #aaa;
+}

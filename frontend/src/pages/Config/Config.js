@@ -27,7 +27,7 @@ function Config() {
           setEmail(user.email || '');
           // Define a url para exibir a imagem: pega de 'profile_picture' ou usa 'default.jpg'
           const pic = user.profile_picture || 'default.jpg';
-          setPreviewUrl(`${process.env.REACT_APP_API_URL}/static/uploads/${pic}`);
+          setPreviewUrl(`/media/${pic}`);
           clearInterval(interval);
         } catch (error) {
           console.error("Erro ao converter o cookie 'user':", error);

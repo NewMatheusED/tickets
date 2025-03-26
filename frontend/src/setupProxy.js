@@ -8,4 +8,12 @@ module.exports = function(app) {
       changeOrigin: true,
     })
   );
+
+  app.use(
+    '/media',
+    createProxyMiddleware({
+      target: 'http://127.0.0.1:5000/static/uploads',
+      changeOrigin: true,
+    })
+  )
 };

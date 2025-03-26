@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import styles from './UserSelect.module.css';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 
 function UserSelect({ users = [], value, onChange, placeholder = "Selecione um usuário" }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -34,7 +35,7 @@ function UserSelect({ users = [], value, onChange, placeholder = "Selecione um u
         {selectedUser ? (
           <>
             <img
-              src={`${process.env.REACT_APP_API_URL}/static/uploads/${selectedUser.profile_picture}`}
+              src={`/media/${selectedUser.profile_picture}`}
               alt={selectedUser.username}
               className={styles.avatar}
             />
@@ -43,7 +44,7 @@ function UserSelect({ users = [], value, onChange, placeholder = "Selecione um u
         ) : (
           <span className={styles.placeholder}>{placeholder}</span>
         )}
-        <span className={styles.arrow}>{dropdownOpen ? '▲' : '▼'}</span>
+        <span className={styles.arrow}>{dropdownOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}</span>
       </div>
       {dropdownOpen && (
         <div className={styles.dropdown}>
@@ -62,7 +63,7 @@ function UserSelect({ users = [], value, onChange, placeholder = "Selecione um u
                 onClick={() => handleSelect(user)}
               >
                 <img
-                  src={`${process.env.REACT_APP_API_URL}/static/uploads/${user.profile_picture}`}
+                  src={`/media/${user.profile_picture}`}
                   alt={user.username}
                   className={styles.avatar}
                 />

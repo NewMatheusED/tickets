@@ -62,7 +62,7 @@ export default function SideNav() {
             </div>
             <div className={styles.profileSection}>
                 <img
-                    src={`${process.env.REACT_APP_API_URL}/static/uploads/${userInfo.profile_picture}`}
+                    src={`/media/${userInfo.profile_picture}`}
                     alt="Profile"
                     className={styles.profileImage}
                 />
