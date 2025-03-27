@@ -184,8 +184,8 @@ function TicketsManager() {
   }
 
   // Função para deletar os tickets selecionados
-  const handleDeleteTickets = async (singleId) => {
-    if (singleId) {
+  const handleDeleteTickets = async (singleId = null) => {
+    if (singleId && selectedTickets.length === 0) {
       const confirm = await MySwal.fire({
         icon: 'warning',
         title: 'Atenção',
@@ -198,8 +198,8 @@ function TicketsManager() {
         MySwal.fire({
           icon: 'success',
           title: 'Ticket deletado!'
-        })
-        setSelectedTicket(null)
+        });
+        setSelectedTicket(null);
         return;
       }
     }
@@ -225,7 +225,7 @@ function TicketsManager() {
           icon: 'error',
           title: 'Erro',
           text: 'Erro ao deletar tickets'
-        })
+        });
       }
     }
   };

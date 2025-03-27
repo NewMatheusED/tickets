@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify, current_app
+from flask import Blueprint, request, jsonify, current_app, session
 import os
 from werkzeug.utils import secure_filename
 from .controller import Controller
@@ -37,3 +37,9 @@ def delete_user():
     email = request.form.get('email')
     controller.delete_user(email)
     return jsonify({'message': 'User deleted'}), 200
+
+@config_bp.route('/change-password', methods=['POST'])
+def change_password():
+    data = request.get_json()
+    user = session.get('user_id_hash')
+    return controller.change_password(user, data)

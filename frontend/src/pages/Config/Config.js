@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { getCookie } from '../../utils/cookies';
 import styles from './Config.module.css';
-import Swal from 'sweetalert2'
-import withReactContent from 'sweetalert2-react-content'
+import Swal from 'sweetalert2';
+import withReactContent from 'sweetalert2-react-content';
 import { useNavigate } from 'react-router';
 
 function Config() {
@@ -10,9 +10,14 @@ function Config() {
   const [email, setEmail] = useState('');
   const [profilePictureFile, setProfilePictureFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState('');
-  const [isLoading, setIsLoading] = useState(false); // novo estado de loading
+  const [isLoading, setIsLoading] = useState(false);
   
-  const MySwal = withReactContent(Swal)
+  // Estados para alteração de senha
+  const [oldPassword, setOldPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmNewPassword, setConfirmNewPassword] = useState('');
+  
+  const MySwal = withReactContent(Swal);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -46,7 +51,7 @@ function Config() {
     }
   };
 
-  const handleDelete = (e) => {
+  const handleDelete = () => {
     MySwal.fire({
       icon: 'info',
       title: 'Certeza?',
@@ -58,13 +63,12 @@ function Config() {
       if (result.isConfirmed) {
         const formData = new FormData();
         formData.append('email', email);
-        try {
-          const response = fetch('/api/deleteUser', {
-            method: 'DELETE',
-            credentials: 'include',
-            body: formData,
-          });
-          response.then((res) => {
+        fetch('/api/deleteUser', {
+          method: 'DELETE',
+          credentials: 'include',
+          body: formData,
+        })
+          .then((res) => {
             if (res.ok) {
               MySwal.fire({
                 title: 'Sucesso!',
@@ -80,7 +84,8 @@ function Config() {
                 icon: 'error'
               });
             }
-          }).catch((error) => {
+          })
+          .catch((error) => {
             console.error('Erro na resposta:', error);
             MySwal.fire({
               title: 'Erro!',
@@ -88,17 +93,13 @@ function Config() {
               icon: 'error'
             });
           });
-        } catch (error) {
-          console.error(error);
-          alert('Erro ao deletar o usuário');
-        }
       }
-    })
-  }
+    });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true); // ativa o loading
+    setIsLoading(true);
     const formData = new FormData();
     formData.append('username', username);
     formData.append('email', email);
@@ -131,13 +132,62 @@ function Config() {
       console.error(error);
       alert('Erro no envio dos dados');
     } finally {
-      setIsLoading(false); // desativa o loading
+      setIsLoading(false);
+    }
+  };
+
+  const handleChangePassword = async (e) => {
+    e.preventDefault();
+    if (newPassword !== confirmNewPassword) {
+      MySwal.fire({
+        icon: 'error',
+        title: 'Erro',
+        text: 'As novas senhas não coincidem'
+      });
+      return;
+    }
+    try {
+      const response = await fetch('/api/change-password', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          oldPassword,
+          newPassword
+        })
+      });
+      if (response.ok) {
+        MySwal.fire({
+          icon: 'success',
+          title: 'Sucesso!',
+          text: 'Senha alterada com sucesso!'
+        });
+        setOldPassword('');
+        setNewPassword('');
+        setConfirmNewPassword('');
+      } else {
+        const errorData = await response.json();
+        MySwal.fire({
+          icon: 'error',
+          title: 'Erro',
+          text: errorData.message || 'Erro ao alterar a senha'
+        });
+      }
+    } catch (error) {
+      console.error(error);
+      MySwal.fire({
+        icon: 'error',
+        title: 'Erro',
+        text: 'Erro ao alterar a senha'
+      });
     }
   };
 
   return (
     <div className={styles.configContainer}>
       <h1>Configurações do Usuário</h1>
+      
+      {/* Formulário para atualizar dados do usuário */}
       <form onSubmit={handleSubmit} className={styles.form}>
         <div className={styles.field}>
           <label htmlFor="username">Nome de Usuário:</label>
@@ -165,10 +215,50 @@ function Config() {
         <button type="submit" className={styles.submitButton} disabled={isLoading}>
           {isLoading ? 'Carregando...' : 'Salvar Configurações'}
         </button>
-        <button type="button" onClick={handleDelete} className={styles.deleteButton}>
-          Deletar Usuário
+      </form>
+      
+      <hr style={{ margin: '1rem 0' }}/>
+      
+      {/* Formulário para alterar senha */}
+      <h2>Alterar Senha</h2>
+      <form onSubmit={handleChangePassword} className={styles.form}>
+        <div className={styles.field}>
+          <label htmlFor="old_password">Senha Atual:</label>
+          <input
+            type="password"
+            id="old_password"
+            value={oldPassword}
+            onChange={(e) => setOldPassword(e.target.value)}
+          />
+        </div>
+        <div className={styles.field}>
+          <label htmlFor="new_password">Nova Senha:</label>
+          <input
+            type="password"
+            id="new_password"
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+          />
+        </div>
+        <div className={styles.field}>
+          <label htmlFor="confirm_new_password">Confirmar Nova Senha:</label>
+          <input
+            type="password"
+            id="confirm_new_password"
+            value={confirmNewPassword}
+            onChange={(e) => setConfirmNewPassword(e.target.value)}
+          />
+        </div>
+        <button type="submit" className={styles.submitButton}>
+          Alterar Senha
         </button>
       </form>
+      
+      <hr style={{ margin: '1rem 0' }}/>
+      
+      <button type="button" onClick={handleDelete} className={styles.deleteButton}>
+        Deletar Usuário
+      </button>
     </div>
   );
 }
