@@ -1,4 +1,4 @@
-from flask import Flask, send_from_directory
+from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from flask_migrate import Migrate
@@ -13,15 +13,6 @@ def create_app():
 
     db.init_app(app)
     cors.init_app(app)
-
-    # Defina o diretório onde as imagens estão
-    UPLOAD_FOLDER = '/var/www/ticketshelpme/tickets/backend/app/static/uploads'
-
-    @app.route('/media/<filename>')
-    def serve_media(filename):
-        # Envia o arquivo estático da pasta uploads
-        return send_from_directory(UPLOAD_FOLDER, filename)
-
 
     with app.app_context():
         from app.routes.auth.views import auth_bp
