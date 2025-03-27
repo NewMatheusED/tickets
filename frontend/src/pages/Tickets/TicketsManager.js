@@ -356,7 +356,7 @@ function TicketsManager() {
                     {assignedUser && (
                       <div className={styles.assignedUser}>
                         <img
-                          src={`/media/${assignedUser.profile_picture}`}
+                          src={`/media/${assignedUser.profile_picture.split('.')[0]}`}
                           alt={assignedUser.username}
                           className={styles.avatar}
                         />

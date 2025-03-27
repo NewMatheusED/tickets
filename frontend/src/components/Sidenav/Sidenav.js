@@ -62,7 +62,7 @@ export default function SideNav() {
             </div>
             <div className={styles.profileSection}>
                 <img
-                    src={`/media/${userInfo.profile_picture}`}
+                    src={`/media/${userInfo.profile_picture.split('.')[0]}`}
                     alt="Profile"
                     className={styles.profileImage}
                 />

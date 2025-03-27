@@ -20,7 +20,7 @@ def get_users():
         })
     return jsonify(users_list)
 
-UPLOAD_FOLDER = '/var/www/ticketshelpme/tickets/backend/app/static/uploads'
+UPLOAD_FOLDER = os.path.join(current_app.root_path, 'static', 'uploads')
 
 @user_bp.route('/media/<filename>', methods=['GET'])
 def serve_media(filename):
@@ -33,4 +33,8 @@ def serve_media(filename):
         if os.path.exists(file_path):
             return send_from_directory(UPLOAD_FOLDER, filename + ext)
     
-    return "Arquivo não encontrado", 404
+    available_files = os.listdir(UPLOAD_FOLDER)
+    return jsonify({
+        "error": "Arquivo não encontrado",
+        "available_files": available_files
+    }), 404

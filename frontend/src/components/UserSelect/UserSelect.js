@@ -35,7 +35,7 @@ function UserSelect({ users = [], value, onChange, placeholder = "Selecione um u
         {selectedUser ? (
           <>
             <img
-              src={`/media/${selectedUser.profile_picture}`}
+              src={`/media/${selectedUser.profile_picture.split('.')[0]}`}
               alt={selectedUser.username}
               className={styles.avatar}
             />
@@ -63,7 +63,7 @@ function UserSelect({ users = [], value, onChange, placeholder = "Selecione um u
                 onClick={() => handleSelect(user)}
               >
                 <img
-                  src={`/media/${user.profile_picture}`}
+                  src={`/media/${user.profile_picture.split('.')[0]}`}
                   alt={user.username}
                   className={styles.avatar}
                 />

@@ -12,7 +12,7 @@ module.exports = function(app) {
   app.use(
     '/media',
     createProxyMiddleware({
-      target: 'http://127.0.0.1:5000/static/uploads',
+      target: 'http://127.0.0.1:5000/media',
       changeOrigin: true,
     })
   )
