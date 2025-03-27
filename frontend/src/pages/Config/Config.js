@@ -5,27 +5,24 @@ import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 import { useNavigate } from 'react-router';
 
-
 function Config() {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [profilePictureFile, setProfilePictureFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState('');
+  const [isLoading, setIsLoading] = useState(false); // novo estado de loading
   
   const MySwal = withReactContent(Swal)
-
   const navigate = useNavigate();
 
   useEffect(() => {
     const interval = setInterval(() => {
-        console.log(process.env);
       const userCookie = getCookie('user');
       if (userCookie) {
         try {
           const user = JSON.parse(userCookie);
           setUsername(user.username || '');
           setEmail(user.email || '');
-          // Define a url para exibir a imagem: pega de 'profile_picture' ou usa 'default.jpg'
           const pic = user.profile_picture || 'default.jpg';
           setPreviewUrl(`/media/${pic.split('.')[0]}`);
           clearInterval(interval);
@@ -67,32 +64,31 @@ function Config() {
             credentials: 'include',
             body: formData,
           });
-            response.then((res) => {
+          response.then((res) => {
             if (res.ok) {
               MySwal.fire({
-              title: 'Sucesso!',
-              text: 'Usuário deletado com sucesso!',
-              icon: 'success'
+                title: 'Sucesso!',
+                text: 'Usuário deletado com sucesso!',
+                icon: 'success'
               });
               document.cookie = 'user=; path=/';
               navigate('/');
             } else {
               MySwal.fire({
-              title: 'Erro!',
-              text: 'Erro ao deletar o usuário!',
-              icon: 'error'
+                title: 'Erro!',
+                text: 'Erro ao deletar o usuário!',
+                icon: 'error'
               });
             }
-            }).catch((error) => {
+          }).catch((error) => {
             console.error('Erro na resposta:', error);
             MySwal.fire({
               title: 'Erro!',
               text: 'Erro ao processar a solicitação!',
               icon: 'error'
             });
-            });
-        }
-        catch (error) {
+          });
+        } catch (error) {
           console.error(error);
           alert('Erro ao deletar o usuário');
         }
@@ -102,6 +98,7 @@ function Config() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true); // ativa o loading
     const formData = new FormData();
     formData.append('username', username);
     formData.append('email', email);
@@ -117,23 +114,24 @@ function Config() {
       });
       if (response.ok) {
         const updatedUser = await response.json();
-        // Atualiza o cookie para refletir as alterações
         document.cookie = `user=${JSON.stringify(updatedUser)}; path=/`;
         MySwal.fire({
           title: 'Sucesso!',
           text: 'Configurações atualizadas com sucesso!',
           icon: 'success'
-        })
+        });
       } else {
         MySwal.fire({
           title: 'Erro!',
           text: 'Erro ao atualizar as configurações!',
           icon: 'error'
-        })
+        });
       }
     } catch (error) {
       console.error(error);
       alert('Erro no envio dos dados');
+    } finally {
+      setIsLoading(false); // desativa o loading
     }
   };
 
@@ -164,8 +162,8 @@ function Config() {
             <img src={previewUrl} alt="Preview" />
           </div>
         )}
-        <button type="submit" className={styles.submitButton}>
-          Salvar Configurações
+        <button type="submit" className={styles.submitButton} disabled={isLoading}>
+          {isLoading ? 'Carregando...' : 'Salvar Configurações'}
         </button>
         <button type="button" onClick={handleDelete} className={styles.deleteButton}>
           Deletar Usuário

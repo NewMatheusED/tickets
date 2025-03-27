@@ -72,9 +72,12 @@ function Register() {
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="Confirme sua senha"
                 />
-                <Button type="submit">
-                    Registrar
-                </Button>
+                <p>Já possui uma conta? Clique <a href='/'>aqui</a></p>
+                <div style={{ display: 'flex', justifyContent: 'center' }}>
+                    <Button type="submit">
+                        Registrar
+                    </Button>
+                </div>
             </form>
         </div>
     );

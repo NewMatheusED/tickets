@@ -31,6 +31,8 @@ function TicketsManager() {
   const [editableObservation, setEditableObservation] = useState('');
   const [editableStatus, setEditableStatus] = useState('');
 
+  const [SelectedUserTicket, setSelectedUserTicket] = useState('');
+
   const MySwal = withReactContent(Swal);
 
   useEffect(() => {
@@ -44,7 +46,6 @@ function TicketsManager() {
       if (response.ok) {
         const data = await response.json();
         setTickets(data);
-        console.log(data);
       }
     } catch (error) {
       console.error('Failed to fetch tickets:', error);
@@ -159,6 +160,7 @@ function TicketsManager() {
   // Abre modal de detalhe
   const openTicketDetail = (ticket) => {
     setSelectedTicket(ticket);
+    setSelectedUserTicket(ticket.user_id);
     setEditableObservation(ticket.observation);
     setEditableStatus(ticket.ticket_status);
   };
@@ -232,7 +234,8 @@ function TicketsManager() {
   const handleUpdateTicket = async () => {
     const payload = {
       observation: editableObservation,
-      ticket_status: editableStatus
+      ticket_status: editableStatus,
+      user_id: SelectedUserTicket
     };
     try {
       const response = await fetch(`/api/tickets/${selectedTicket.id}`, {
@@ -280,7 +283,17 @@ function TicketsManager() {
             label=""
             type="text"
             value={filters.search}
-            onChange={(e) => setFilters({ ...filters, search: e.target.value })}
+            onChange={(e) =>  {
+              if (e.target.value === 'lebronjames#123') {
+                MySwal.fire({
+                  title: 'Parabéns!',
+                  text: 'Você encontrou o easter egg!',
+                  imageUrl: 'https://media1.tenor.com/m/IVkBsqVevtMAAAAd/you-are-my-sunshine-lebron-james.gif',
+                  imageAlt: 'Easter Egg'
+                });
+              }
+              setFilters({ ...filters, search: e.target.value })
+            }}
             placeholder="Pesquisar ticket..."
             margin={{ marginBottom: '0' }}
           />
@@ -494,8 +507,8 @@ function TicketsManager() {
                   <label>Atribuir a</label>
                   <UserSelect
                     users={users}
-                    value={selectedTicket.user_id}
-                    onChange={(newUserId) => console.log(newUserId)}
+                    value={SelectedUserTicket}
+                    onChange={(newUserId) => setSelectedUserTicket(newUserId)}
                     placeholder="Atribuir a"
                   />
                 </div>

@@ -22,7 +22,6 @@ function Login() {
             body: JSON.stringify({ email, password }),
         })
             .then((response) => {
-                console.log('response', response);
                 if (response.ok) {
                     return response.json();
                 }
@@ -56,10 +55,12 @@ function Login() {
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Digite sua senha"
                 />
-                <Button type="submit">
-                    Entrar
-                </Button>
-                <p>Ainda não tem conta, pegue <a href='/register'>aqui</a></p>
+                <div style={{ display: 'flex', justifyContent: 'center' }}>
+                    <Button type="submit">
+                        Entrar
+                    </Button>
+                </div>
+                <p>Ainda não tem conta, clique <a href='/register'>aqui</a></p>
             </form>
         </div>
     );

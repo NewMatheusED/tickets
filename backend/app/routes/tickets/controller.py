@@ -55,3 +55,28 @@ class Controller:
         db.session.delete(ticket)
         db.session.commit()
         return {'message': 'Ticket deleted successfully'}, 200
+    
+    def updateTicket(self, ticket_id, data):
+        ticket = Tickets.query.filter_by(ticket_id_hash=ticket_id).first()
+        if not ticket:
+            return {'message': 'Ticket not found'}, 404
+        updatable_fields = [
+            'observation', 'ticket_status'
+        ]
+        for field in updatable_fields:
+            if field in data:
+                setattr(ticket, field, data[field])
+        
+        ticket_user_base = User.query.filter_by(id=ticket.user_id).first().user_id_hash
+
+        session_user = session.get('user_id_hash')
+
+        if ticket_user_base == data.get('user_id'):
+            ticket.user_id = User.query.filter_by(user_id_hash=session_user).first().id
+        else:
+            ticket.user_id = User.query.filter_by(id=data.get('user_id')).first().id
+
+        
+        ticket.ticket_date = datetime.utcnow()
+        db.session.commit()
+        return {'message': 'Ticket updated successfully'}, 200

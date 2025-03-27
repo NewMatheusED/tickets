@@ -26,6 +26,7 @@ def handleTicket(ticket_id):
         data = request.get_json()
         if not data:
             return jsonify({'message': 'No input data provided'}), 400
+        print(data)
         result = controller.updateTicket(ticket_id, data)
         return jsonify(result)
     elif request.method == 'DELETE':
